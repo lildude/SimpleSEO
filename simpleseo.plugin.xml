@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <pluggable type="plugin" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://schemas.habariproject.org/Pluggable-1.3.xsd">
-    <name>Better SEO</name>
+    <name>Simple SEO</name>
     <license url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License 2.0</license>
 	<author url="http://colinseymour.co.uk">Colin Seymour</author>
 	<copyright>2012</copyright>
 	<version>0.1</version>
     <url>http://lildude.co.uk/</url>
-    <description><![CDATA[Improve your Habari SEO using Better SEO]]></description>
+    <description><![CDATA[Improve your Habari SEO using Simple SEO]]></description>
 	<help>
-		<value><![CDATA[<p>This is my own SEO plugin. It borrows some ideas from MetaSEO, but without all the complexities MetaSEO provides.</p>]]></value>
+		<value><![CDATA[<p>This is a simple SEO plugin. It borrows some ideas from MetaSEO, 
+		but without all the complexities MetaSEO provides. Instead it uses the information 
+		within your posts and pages to set appropriate SEO, Twitter, Google+ and Facebook 
+		friendly headers.</p>]]></value>
 	</help>
 </pluggable>

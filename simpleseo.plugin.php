@@ -1,5 +1,5 @@
 <?php
-class BetterSEO extends Plugin
+class SimpleSEO extends Plugin
 {
 	/**
 	 * Add all the SEO related tags to the theme header
@@ -90,7 +90,7 @@ class BetterSEO extends Plugin
 	 * - imgsrc  (used by Twitter/Facebook/Google+ for the image in linked posts)
 	 * - robots
 	 */
-	public function get_betterseo()
+	public function get_simpleseo()
 	{
 		// Default options - we only overwrite these if the defaults are not acceptable
 		$sep = " - ";	// TODO: Make this configurable
