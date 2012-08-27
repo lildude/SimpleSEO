@@ -2,6 +2,43 @@
 class SimpleSEO extends Plugin
 {
 	/**
+	 * Add a config menu item
+	 */
+	public function filter_plugin_config( $actions, $plugin_id )
+	{
+		if ($plugin_id == $this->plugin_id()) {
+			$actions['configure'] = _t( 'Configure' );
+		}
+		return $actions;
+	}
+	
+	/**
+	 * Add the config UI
+	 */
+	public function action_plugin_ui_configure()
+    {
+			$ui = new FormUI( __CLASS__  );
+			$ui->append( 'text', 'sep', __CLASS__ . '__sep', _t( 'Title separator (incl spaces - " : " by default)' ) );
+			$ui->append( 'static', 'nocontent', 'Don\'t forget to set the site specific keywords in the <a href="'.Site::get_url('admin').'/options">Site Options</a>' );
+			$ui->append( 'submit', 'save', _t( 'Save' ) );
+			$ui->set_option('success_message', _t( 'Options saved' ) );
+			$ui->out();
+	}
+	
+	/**
+	 * Add a configuration option to set keywords
+	 */
+	public function filter_admin_option_items( $option_items )
+	{
+		$option_items[_t( 'Name & Tagline' )]['keywords'] = array(
+				'label' => _t( 'Site Keywords' ),
+				'type' => 'text',
+				'helptext' => _t( 'Comma separated list of default site keywords.' ),
+				);
+		return $option_items;
+	}
+	
+	/**
 	 * Add all the SEO related tags to the theme header
 	 * 
 	 * TODO: should this actually be called action_template_header() ?
@@ -9,7 +46,7 @@ class SimpleSEO extends Plugin
 	public function theme_header( $theme )
 	{
 		$this->theme = $theme;	// We need this so we can access it in our functions
-		return $this->get_betterseo;
+		return $this->get_simpleseo();
 	}
 	
 	/**
@@ -23,16 +60,18 @@ class SimpleSEO extends Plugin
 	 */
 	public function filter_final_output( $buffer )
 	{
-		$seo_title = $this->get_title();
-		if ( strlen( $seo_title ) ) {
-			if ( strpos( $buffer, '<title>' ) !== false ) {
-				$buffer = preg_replace( "%<title\b[^>]*>(.*?)</title>%is", "<title>{$seo_title}</title>", $buffer );
+		if ( URL::get_matched_rule()->action != 'admin' ) {
+			$seo_title = $this->get_title();
+			if ( strlen( $seo_title ) ) {
+				if ( strpos( $buffer, '<title>' ) !== false ) {
+					$buffer = preg_replace( "%<title\b[^>]*>(.*?)</title>%is", "<title>{$seo_title}</title>", $buffer );
+				}
+				else {
+					$buffer = preg_replace( "%</head>%is", "<title>{$seo_title}</title>\n</head>", $buffer );
+				}
 			}
-			else {
-				$buffer = preg_replace( "%</head>%is", "<title>{$seo_title}</title>\n</head>", $buffer );
-			}
+			return $buffer;
 		}
-		return $buffer;
 	}
 		
 	/* -------:[ WORKER FUNCTIONS ]:------- */
@@ -45,16 +84,17 @@ class SimpleSEO extends Plugin
 		$matched_rule = URL::get_matched_rule();
 		if ( is_object( $matched_rule ) ) {
             $rule = $matched_rule->name;
+			$sep = ( Options::get( __CLASS__ . '__sep' ) ) ? Options::get( __CLASS__ . '__sep' ) : ' : ';
 			switch( $rule ) {
                 case 'display_entry':
-                    $title = $post->title . $sep . Options::get( 'title' );
+                    $title = $this->theme->post->title . $sep . Options::get( 'title' );
                     break;
                 case 'display_entries':
                     $title = Options::get( 'title' ).' '.$sep.' '.Options::get( 'tagline' );
                     $title .= ( $page > 1 ) ? $sep .'Page '.$page : '';
                     break;
                 case 'display_page':
-                    $title = $post->title . $sep . Options::get( 'title' );
+                    $title = $this->theme->post->title . $sep . Options::get( 'title' );
                     break;
                 case 'display_entries_by_tag':
                     $title = 'Posts tagged with: '.$tag . $sep . Options::get( 'title' );
@@ -73,7 +113,7 @@ class SimpleSEO extends Plugin
 					$title = 'Posts for '.$month_names[$month-1].' '.$year.' '.$sep.' Page '.$page;
 					break;
                 default:
-                    $title = $post->title . $sep . Options::get( 'title' );
+					$title = '';
             }
 			return $title;
 		}
@@ -93,11 +133,11 @@ class SimpleSEO extends Plugin
 	public function get_simpleseo()
 	{
 		// Default options - we only overwrite these if the defaults are not acceptable
-		$sep = " - ";	// TODO: Make this configurable
 		// About is taken from the About setting in later revs of Habari.
         $description = Options::get( 'about' );
 		// Get tags from theme config option.
         $tags = Options::get( __CLASS__ . '__site_tags' );
+		$sep = ( Options::get( __CLASS__ . '__sep' ) ) ? Options::get( __CLASS__ . '__sep' ) : ' : ';
         $title = '';
         $robots = '';
 		// Set this to the apple-touch-icon image, else set it to the first image in the post.
@@ -108,9 +148,9 @@ class SimpleSEO extends Plugin
             $rule = $matched_rule->name;
             switch( $rule ) {
                 case 'display_entry':
-                    $description = ( self::truncate( $post->content ) != '' ) ? self::truncate( $post->content ) : $post->title;
-                    $tags = implode( ', ', (array)$post->tags );
-					$imgsrc = $theme->find_first_image( $post->content );
+                    $description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
+                    $tags = implode( ', ', (array)$this->theme->post->tags );
+					$imgsrc = self::find_first_image( $this->theme->post->content );
 					if ( !is_null( $imgsrc ) ) {
 						$image_src = $imgsrc;
 					}
@@ -119,9 +159,9 @@ class SimpleSEO extends Plugin
                     $robots = 'noindex,follow';
                     break;
                 case 'display_page':
-                    $description = ( self::truncate( $post->content ) != '' ) ? self::truncate( $post->content ) : $post->title;
-                    $tags = implode( ', ', (array)$post->tags );
-                    if ( $post->title == 'Archives' ) {
+                    $description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
+                    $tags = implode( ', ', (array)$this->theme->post->tags );
+                    if ( $this->theme->post->title == 'Archives' ) {
                         $robots = 'noindex,follow';
                     }
                     break;
@@ -130,6 +170,8 @@ class SimpleSEO extends Plugin
                     $robots = 'noindex,follow';
                     break;
                 case 'display_home':
+					$tags = Options::get( 'keywords' );
+					$description = Options::get( 'about' );
                     break;
                 case 'display_search':
                     $robots = 'noindex,follow';
@@ -144,8 +186,8 @@ class SimpleSEO extends Plugin
 					$robots = 'noindex,follow';
 					break;
                 default:
-                    $description = ( self::truncate( $post->content ) != '' ) ? self::truncate( $post->content ) : $post->title;
-                    $tags = ( count( $post->tags ) > 0 ) ? implode( ', ', (array)$post->tags ) : '';
+                    $description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
+                    $tags = ( count( $this->theme->post->tags ) > 0 ) ? implode( ', ', (array)$this->theme->post->tags ) : '';
             }
 			$out = '<meta name="description" content="' . $description .'">';
 			if ( $tags != '' ) { 
@@ -175,6 +217,21 @@ class SimpleSEO extends Plugin
         $desc = strip_tags( trim( $desc ) );
         return $desc;
      }
+	 
+	 /**
+	  * Locate the first image in a the string passed to this function.
+	  * 
+	  * This is useful in setting the image_src things like Facebook and Google+ look for in a post.
+	  * 
+	  * @param string $string Text you want to search for an image
+	  * @return string|null Either the image string or nothing.
+	  */
+	 public static function find_first_image( $string ) 
+	 {
+		$matches = array();
+		preg_match( "!http://[a-z0-9\-\.\/_~]+\.(?:jpe?g|png|gif)!Ui", $string, $matches );
+		return ( !empty( $matches[0] ) ) ? $matches[0] : null;			
+	 }
 	
 }
 
