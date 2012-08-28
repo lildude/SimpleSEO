@@ -4,11 +4,9 @@ class SimpleSEO extends Plugin
 	/**
 	 * Add a config menu item
 	 */
-	public function filter_plugin_config( $actions, $plugin_id )
+	public function filter_plugin_config( $actions )
 	{
-		if ($plugin_id == $this->plugin_id()) {
-			$actions['configure'] = _t( 'Configure' );
-		}
+		$actions['configure'] = _t( 'Configure' );
 		return $actions;
 	}
 	
@@ -17,11 +15,11 @@ class SimpleSEO extends Plugin
 	 */
 	public function action_plugin_ui_configure()
     {
-			$ui = new FormUI( __CLASS__  );
+			$ui = new FormUI( __CLASS__ );
 			$ui->append( 'text', 'sep', __CLASS__ . '__sep', _t( 'Title separator (incl spaces - " : " by default)' ) );
 			$ui->append( 'static', 'nocontent', 'Don\'t forget to set the site specific keywords in the <a href="'.Site::get_url('admin').'/options">Site Options</a>' );
 			$ui->append( 'submit', 'save', _t( 'Save' ) );
-			$ui->set_option('success_message', _t( 'Options saved' ) );
+			$ui->set_option( 'success_message', _t( 'Options saved' ) );
 			$ui->out();
 	}
 	
@@ -41,7 +39,6 @@ class SimpleSEO extends Plugin
 	/**
 	 * Add all the SEO related tags to the theme header
 	 * 
-	 * TODO: should this actually be called action_template_header() ?
 	 */
 	public function theme_header( $theme )
 	{
@@ -70,8 +67,8 @@ class SimpleSEO extends Plugin
 					$buffer = preg_replace( "%</head>%is", "<title>{$seo_title}</title>\n</head>", $buffer );
 				}
 			}
-			return $buffer;
 		}
+		return $buffer;
 	}
 		
 	/* -------:[ WORKER FUNCTIONS ]:------- */
