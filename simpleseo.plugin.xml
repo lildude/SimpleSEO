@@ -13,4 +13,7 @@
 		within your posts and pages to set appropriate SEO, Twitter, Google+ and Facebook 
 		friendly headers.</p>]]></value>
 	</help>
+	<provides>
+		<feature>SimpleSEO</feature>
+	</provides>
 </pluggable>
