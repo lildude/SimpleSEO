@@ -83,6 +83,7 @@ class SimpleSEO extends Plugin
             $rule = $matched_rule->name;
 			$sep = ( Options::get( __CLASS__ . '__sep' ) ) ? Options::get( __CLASS__ . '__sep' ) : ' : ';
 			switch( $rule ) {
+				case 'display_post':
                 case 'display_entry':
                     $title = $this->theme->post->title . $sep . Options::get( 'title' );
                     break;
@@ -144,6 +145,7 @@ class SimpleSEO extends Plugin
 		if ( is_object( $matched_rule ) ) {
             $rule = $matched_rule->name;
             switch( $rule ) {
+				case 'display_post':
                 case 'display_entry':
                     $description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
                     $tags = implode( ', ', (array)$this->theme->post->tags );
