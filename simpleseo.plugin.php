@@ -82,12 +82,14 @@ class SimpleSEO extends Plugin
 		if ( is_object( $matched_rule ) ) {
             $rule = $matched_rule->name;
 			$sep = ( Options::get( __CLASS__ . '__sep' ) ) ? Options::get( __CLASS__ . '__sep' ) : ' : ';
+			$handler_vars = Controller::get_handler_vars();
 			switch( $rule ) {
 				case 'display_post':
                 case 'display_entry':
                     $title = $this->theme->post->title . $sep . Options::get( 'title' );
                     break;
                 case 'display_entries':
+					$page = ( isset( $handler_vars['page'] ) ) ? $handler_vars['page'] : 1;
                     $title = Options::get( 'title' ).' '.$sep.' '.Options::get( 'tagline' );
                     $title .= ( $page > 1 ) ? $sep .'Page '.$page : '';
                     break;
@@ -95,6 +97,7 @@ class SimpleSEO extends Plugin
                     $title = $this->theme->post->title . $sep . Options::get( 'title' );
                     break;
                 case 'display_entries_by_tag':
+					$tag = $handler_vars['tag'];
                     $title = 'Posts tagged with: '.$tag . $sep . Options::get( 'title' );
                     break;
                 case 'display_home':
