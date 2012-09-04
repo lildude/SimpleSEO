@@ -143,7 +143,7 @@ class SimpleSEO extends Plugin
         $robots = '';
 		// Set this to the apple-touch-icon image, else set it to the first image in the post.
 		$image_src = Site::get_url( 'theme' ) . '/img/apple-touch-icon.png';
-		
+		$handler_vars = Controller::get_handler_vars();
 		$matched_rule = URL::get_matched_rule();
 		if ( is_object( $matched_rule ) ) {
             $rule = $matched_rule->name;
@@ -168,7 +168,7 @@ class SimpleSEO extends Plugin
                     }
                     break;
                 case 'display_entries_by_tag':
-                    $tags = $tag;
+                    $tags = $handler_vars['tag'];
                     $robots = 'noindex,follow';
                     break;
                 case 'display_home':
