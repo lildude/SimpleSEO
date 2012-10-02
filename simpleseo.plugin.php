@@ -83,13 +83,14 @@ class SimpleSEO extends Plugin
             $rule = $matched_rule->name;
 			$sep = ( Options::get( __CLASS__ . '__sep' ) ) ? Options::get( __CLASS__ . '__sep' ) : ' : ';
 			$handler_vars = Controller::get_handler_vars();
+			$page = ( isset( $handler_vars['page'] ) ) ? $handler_vars['page'] : 1;
+			
 			switch( $rule ) {
 				case 'display_post':
                 case 'display_entry':
                     $title = $this->theme->post->title . $sep . Options::get( 'title' );
                     break;
                 case 'display_entries':
-					$page = ( isset( $handler_vars['page'] ) ) ? $handler_vars['page'] : 1;
                     $title = Options::get( 'title' ).' '.$sep.' '.Options::get( 'tagline' );
                     $title .= ( $page > 1 ) ? $sep .'Page '.$page : '';
                     break;
@@ -110,6 +111,8 @@ class SimpleSEO extends Plugin
                     $title = 'Page Not Found' . $sep . Options::get( 'title' );
                     break;
 				case 'display_entries_by_date':
+					$year = $handler_vars['year'];
+					$month = $handler_vars['month'];
 					$month_names = array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' );
 					$title = 'Posts for '.$month_names[$month-1].' '.$year.' '.$sep.' Page '.$page;
 					break;
@@ -141,6 +144,9 @@ class SimpleSEO extends Plugin
 		$sep = ( Options::get( __CLASS__ . '__sep' ) ) ? Options::get( __CLASS__ . '__sep' ) : ' : ';
         $title = '';
         $robots = '';
+		$page = ( isset( $handler_vars['page'] ) ) ? $handler_vars['page'] : 1;
+
+		
 		// Set this to the apple-touch-icon image, else set it to the first image in the post.
 		$image_src = Site::get_url( 'theme' ) . '/img/apple-touch-icon.png';
 		$handler_vars = Controller::get_handler_vars();
@@ -183,6 +189,8 @@ class SimpleSEO extends Plugin
                     $robots = 'noindex,follow';
                     break;
 				case 'display_entries_by_date':
+					$year = $handler_vars['year'];
+					$month = $handler_vars['month'];					
 					$month_names = array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' );
 					$description = 'Posts for '.$month_names[$month-1].' '.$year . $sep . 'Page '.$page;
 					$robots = 'noindex,follow';
