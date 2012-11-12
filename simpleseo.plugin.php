@@ -232,6 +232,9 @@ class SimpleSEO extends Plugin
 	  * Locate the first image in a the string passed to this function.
 	  * 
 	  * This is useful in setting the image_src things like Facebook and Google+ look for in a post.
+	  *
+	  * This function will also return the "hqdefault" (480x360) YouTube thumbnail 
+	  * if a YouTube video is found and not images are found.
 	  * 
 	  * @param string $string Text you want to search for an image
 	  * @return string|null Either the image string or nothing.
@@ -240,6 +243,17 @@ class SimpleSEO extends Plugin
 	 {
 		$matches = array();
 		preg_match( "!http://[a-z0-9\-\.\/_~]+\.(?:jpe?g|png|gif)!Ui", $string, $matches );
+		// If we get this far, it means no image has been found.  What about YouTube vids?
+		if ( empty( $matches[0] ) ) {
+			preg_match( '/www\.youtube(-nocookie)?\.com\/.*[^\/]\/([a-zA-Z0-9\-\_]{11})([^<\s]*)/', $string, $ytMatches);
+			if ( $ytMatches ) {
+
+				$vidId = $ytMatches[2];
+				$imageurl = "http://i.ytimg.com/vi/{$vidId}/hqdefault.jpg";
+				// Add img to $matches array
+				$matches[0] = $imageurl;
+			}
+		}
 		return ( !empty( $matches[0] ) ) ? $matches[0] : null;			
 	 }
 	
