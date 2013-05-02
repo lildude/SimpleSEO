@@ -196,8 +196,14 @@ class SimpleSEO extends Plugin
 					$robots = 'noindex,follow';
 					break;
                 default:
-                    $description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
-                    $tags = ( count( $this->theme->post->tags ) > 0 ) ? implode( ', ', (array)$this->theme->post->tags ) : '';
+                	if ( isset( $this->theme->post ) ) {
+                		$tags = ( count( $this->theme->post->tags ) > 0 ) ? implode( ', ', (array)$this->theme->post->tags ) : '';
+                    	$description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
+                	} else {
+                		$description = Options::get( 'tagline' );
+                		$tags = "";
+                	}
+                    
             }
 			$out = '<meta name="description" content="' . $description .'">';
 			if ( $tags != '' ) { 
