@@ -248,7 +248,7 @@ class SimpleSEO extends Plugin
 	 public static function find_first_image( $string ) 
 	 {
 		$matches = array();
-		preg_match( "!(https?:)?(//[a-z0-9\-\.\/_~\ ]+\.(?:jpe?g|png|gif))!Ui", $string, $matches );
+		preg_match( "!(https?:)?(//[a-zA-Z0-9\-\.\/_~\ %]+\.(?:jpe?g|png|gif))!Ui", $string, $matches );
 		// If we get this far, it means no image has been found.  What about YouTube vids?
 		if ( empty( $matches[0] ) ) {
 
