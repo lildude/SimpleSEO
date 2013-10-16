@@ -156,11 +156,13 @@ class SimpleSEO extends Plugin
             switch( $rule ) {
 				case 'display_post':
                 case 'display_entry':
-                    $description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
-                    $tags = implode( ', ', (array)$this->theme->post->tags );
-					$imgsrc = self::find_first_image( $this->theme->post->content );
-					if ( !is_null( $imgsrc ) ) {
-						$image_src = $imgsrc;
+                	if ( $this->theme->post ) {
+                    	$description = ( self::truncate( $this->theme->post->content ) != '' ) ? self::truncate( $this->theme->post->content ) : $this->theme->post->title;
+                    	$tags = implode( ', ', (array)$this->theme->post->tags );
+						$imgsrc = self::find_first_image( $this->theme->post->content );
+						if ( !is_null( $imgsrc ) ) {
+							$image_src = $imgsrc;
+						}
 					}
                     break;
                 case 'display_entries':
